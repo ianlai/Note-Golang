@@ -1,11 +1,13 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
 )
 
 type Page struct {
@@ -15,6 +17,8 @@ type Page struct {
 
 /* ParseFiles function takes any number of arguments for the file names */
 var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
+
+var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
 func (p *Page) save() error {
 	filename := p.Title + ".txt"
@@ -56,7 +60,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 // }
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
-	title := r.URL.Path[len("/view/"):]
+
+	/* Not safe */
+	//title := r.URL.Path[len("/view/"):]
+
+	/* Safer */
+	title, err := checkAndGetTitle(w, r)
+	if err != nil {
+		return
+	}
+
 	log.Println("viewHandler: title " + title)
 	p, err := loadPage(title)
 	if err != nil {
@@ -70,7 +83,14 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func editHandler(w http.ResponseWriter, r *http.Request) {
-	title := r.URL.Path[len("/edit/"):]
+	/* Not safe */
+	//title := r.URL.Path[len("/view/"):]
+
+	/* Safer */
+	title, err := checkAndGetTitle(w, r)
+	if err != nil {
+		return
+	}
 	p, err := loadPage(title)
 	if err != nil {
 		p = &Page{Title: title}
@@ -88,17 +108,34 @@ func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
 }
 
 func saveHandler(w http.ResponseWriter, r *http.Request) {
-	title := r.URL.Path[len("/save/"):]
+	/* Not safe */
+	//title := r.URL.Path[len("/view/"):]
+
+	/* Safer */
+	title, err := checkAndGetTitle(w, r)
+	if err != nil {
+		return
+	}
 	log.Println("saveHandler: title " + title)
 
 	body := r.FormValue("body")
 	p := &Page{Title: title, Body: []byte(body)}
-	err := p.save()
+	err = p.save()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	http.Redirect(w, r, "/view/"+title, http.StatusFound)
+}
+
+func checkAndGetTitle(w http.ResponseWriter, r *http.Request) (string, error) {
+	m := validPath.FindStringSubmatch(r.URL.Path)
+	if m == nil {
+		http.NotFound(w, r)
+		return "", errors.New("Invalid Page Title")
+	}
+	log.Println("checkAndGetTitle: title " + m[2])
+	return m[2], nil // The title is the second subexpression.
 }
 
 func main() {
