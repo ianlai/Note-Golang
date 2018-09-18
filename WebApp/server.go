@@ -78,15 +78,36 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-	t, _ := template.ParseFiles(tmpl + ".html")
-	t.Execute(w, p)
+	t, err := template.ParseFiles(tmpl + ".html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = t.Execute(w, p)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func saveHandler(w http.ResponseWriter, r *http.Request) {
+	title := r.URL.Path[len("/save/"):]
+	log.Println("saveHandler: title " + title)
+
+	body := r.FormValue("body")
+	p := &Page{Title: title, Body: []byte(body)}
+	err := p.save()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/view/"+title, http.StatusFound)
 }
 
 func main() {
 	fmt.Println("Server is running now...")
 
 	/* Seed the page */
-	p1 := &Page{Title: "FirstPage", Body: []byte("This is a sample Page.")}
+	p1 := &Page{Title: "SamplePage", Body: []byte("This is a sample Page.")}
 	p1.save()
 
 	/* Local load */
@@ -99,7 +120,7 @@ func main() {
 	/* Handlers */
 	http.HandleFunc("/view/", viewHandler)
 	http.HandleFunc("/edit/", editHandler)
-	//http.HandleFunc("/save/", saveHandler)
+	http.HandleFunc("/save/", saveHandler)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
