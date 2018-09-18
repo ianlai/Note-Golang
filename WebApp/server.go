@@ -19,7 +19,10 @@ func (p *Page) save() error {
 }
 func loadPage(title string) (*Page, error) {
 	filename := title + ".txt"
-	body, _ := ioutil.ReadFile(filename)
+	body, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
 	return &Page{Title: title, Body: body}, nil
 }
 
@@ -52,7 +55,12 @@ func handler(w http.ResponseWriter, r *http.Request) {
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	title := r.URL.Path[len("/view/"):]
 	log.Println("viewHandler: title " + title)
-	p, _ := loadPage(title)
+	p, err := loadPage(title)
+	if err != nil {
+		http.Redirect(w, r, "/edit/"+title, http.StatusFound)
+		log.Println("redirect to: " + "/edit/" + title)
+		return
+	}
 	renderTemplate(w, "view", p)
 	// t, _ := template.ParseFiles("view.html")
 	// t.Execute(w, p)
@@ -85,6 +93,7 @@ func main() {
 	//p2, _ := loadPage("FirstPage")
 	//fmt.Println(string(p2.Body))
 
+	/* Deprecated */
 	//http.HandleFunc("/", handler)
 
 	/* Handlers */
