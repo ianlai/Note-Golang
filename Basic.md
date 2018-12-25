@@ -305,8 +305,70 @@ func main() {
 	fmt.Println(f.Abs())
 }
 ```
+### Pointer Receivers 
+##### Methods with pointer receivers can modify the value to which the receiver points
+##### With a value receiver, the method operates on a copy of the original value
+```
+type Vertex struct {
+	X, Y float64
+}
+
+func (v Vertex) Abs() float64 {
+	return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+
+func (v *Vertex) Scale(f float64) {
+	v.X = v.X * f
+	v.Y = v.Y * f
+}
+
+func main() {
+	v := Vertex{3, 4}
+	v.Scale(100)
+	fmt.Println(v.Abs())   //result is 500; result becomes 5 if Scale function's receiver is a value receiver
+}
+```
 
 ### Interface 
+##### An interface type is defined as a set of method signatures.
 ```
+type Abser interface {
+	Abs() float64
+}
+
+func main() {
+	var a Abser
+	f := MyFloat(-math.Sqrt2)
+	v := Vertex{3, 4}
+
+	a = f  // a MyFloat implements Abser
+	fmt.Println(a.Abs())
+	
+	a = &v // a *Vertex implements Abser
+	fmt.Println(a.Abs())
+	
+	// In the following line, v is a Vertex (not *Vertex)
+	// and does NOT implement Abser.
+	//a = v
+
+	
+}
+
+type MyFloat float64
+
+func (f MyFloat) Abs() float64 {
+	if f < 0 {
+		return float64(-f)
+	}
+	return float64(f)
+}
+
+type Vertex struct {
+	X, Y float64
+}
+
+func (v *Vertex) Abs() float64 {
+	return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
 
 ```
