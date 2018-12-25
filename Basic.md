@@ -1,5 +1,5 @@
 ### Multiple results
-```
+```go
 func swap(x, y string) (string, string) {
 	return y, x
 }
@@ -9,7 +9,7 @@ a, b := swap("hello", "world")
 ```
 
 ### Named return values 
-```
+```go
 func split(sum int) (x, y int) {
 	x = sum * 4 / 9
 	y = sum - x
@@ -25,22 +25,22 @@ for i := 0; i < 10; i++ {
 ```
 
 ### While loop
-```
+```go
 for sum < 1000 {
 	sum += sum
 }
 ```
 
 ### If
-```
+```go
 if x < 0 {
 	return sqrt(-x) + "i"
 }
 ```
 
 ### Switch
-```
-	switch os := runtime.GOOS; os {
+```go
+switch os := runtime.GOOS; os {
 	case "darwin":
 		fmt.Println("OS X.")
 	case "linux":
@@ -48,13 +48,13 @@ if x < 0 {
 	default:
 		// freebsd, openbsd,
 		// plan9, windows...
-		fmt.Printf("%s.", os)
-	}
+	fmt.Printf("%s.", os)
+}
 ```
 
 ### Defer
 ##### Execute the deferred function until the surrounding function returns.
-```
+```go
 func main() {
 	defer fmt.Println("world")
 
@@ -66,7 +66,7 @@ func main() {
 ```
 
 ### Struct 
-```
+```go
 type Vertex struct {
     X int
     Y int
@@ -101,7 +101,7 @@ func main() {
 ```
 
 ### Array
-```
+```go
 var myint int
 var myarr [5]string
 myarr[0] = "Hi"
@@ -113,7 +113,7 @@ fmt.Println(myarr[0], myarr[1])
 ### Slice 
 - A slice does not store any data, it just describes a section of an underlying array.
 
-```
+```go
 names := [4]string{
 	"John",
 	"Paul",
@@ -134,7 +134,7 @@ fmt.Println(names)
 - Creating a slice with make
 - The make function allocates a zeroed array and returns a slice that refers to that array.
 
-```
+```go
 a := make([]int, 5)
 printSlice("a", a)
 func printSlice(s string, x []int) {
@@ -145,7 +145,7 @@ func printSlice(s string, x []int) {
 
 
 ### Slice literals
-```
+```go
 s := []struct {
 	i int
 	b bool
@@ -161,7 +161,7 @@ s := []struct {
 
 
 ### Range 
-```
+```go
 var pow = []int{1, 2, 4, 8, 16, 32, 64, 128}
 
 func main() {
@@ -175,7 +175,7 @@ func main() {
 ```
 
 ### Map 
-```
+```go
 type Vertex struct {
 	Lat, Long float64
 }
@@ -197,7 +197,7 @@ func main() {
 ```
 
 ### Map literals 
-```
+```go
 var m = map[string]Vertex{
 	"Bell Labs": Vertex{
 		40.68433, -74.39967,
@@ -215,7 +215,7 @@ var m = map[string]Vertex{ //type can be omitted
 ### Function values
 - Functions are values too. They can be passed around just like other values.
 
-```
+```go
 func compute(fn func(int, int) int, a int, b int) int {  //3 arguments(func, int, int) 
 	return fn(a, b)
 }
@@ -233,7 +233,7 @@ func main() {
 ```
 
 ### Function closures
-```
+```go
 func adder() func(int) int {
 	sum := 0   //bound to the returned function 
 	return func(x int) int {
@@ -264,10 +264,10 @@ output:
 ### Methods
 ##### A method is a function with a receiver argument.
 Form:
-```
+```go
 func (receiver) func_name(argument) return_type 
 ```
-```
+```go
 type Vertex struct {
 	X, Y float64
 }
@@ -290,7 +290,7 @@ func main() {
 ```
 ##### We can declare a method on non-struct types, too.
 However, we can only declare a method with a receiver whose type is defined in the same package as the method (which means not applicable to int). 
-```
+```go
 type MyFloat float64  //MyFloat is defined in this package so we can declar a method on it 
 
 func (f MyFloat) Abs() float64 {
@@ -308,7 +308,7 @@ func main() {
 ### Pointer Receivers 
 ##### Methods with pointer receivers can modify the value to which the receiver points
 ##### With a value receiver, the method operates on a copy of the original value
-```
+```go
 type Vertex struct {
 	X, Y float64
 }
@@ -331,7 +331,7 @@ func main() {
 
 ### Interface 
 ##### An interface type is defined as a set of method signatures.
-```
+```go
 type Abser interface {
 	Abs() float64
 }
@@ -370,5 +370,4 @@ type Vertex struct {
 func (v *Vertex) Abs() float64 {
 	return math.Sqrt(v.X*v.X + v.Y*v.Y)
 }
-
 ```
