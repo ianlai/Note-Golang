@@ -371,3 +371,25 @@ func (v *Vertex) Abs() float64 {
 	return math.Sqrt(v.X*v.X + v.Y*v.Y)
 }
 ```
+
+##### Interfaces are implemented implicitly
+```
+type I interface {
+	M()
+}
+
+type T struct {
+	S string
+}
+
+// This method means type T implements the interface I because M() is in I,
+// but we don't need to explicitly declare that it does so.
+func (t T) M() {
+	fmt.Println(t.S)
+}
+
+func main() {
+	var i I = T{"hello"}  //Assign a struct T to the interface I 
+	i.M()                 //Then, interface I can call M() implemented by T
+}
+```
